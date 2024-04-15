@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../Firebase";
 import {
   createUserWithEmailAndPassword,
@@ -10,7 +10,7 @@ import {
 const AuthContext = createContext();
 
 export function AuthContextProvider({ children }) {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
 
   //create user with email and password
   function signUp(email, password) {
@@ -29,18 +29,19 @@ export function AuthContextProvider({ children }) {
 
   // onAuthStateChanged
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentuser) => {
-      setUser(currentuser);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
     });
     return () => unsubscribe();
   }, []);
 
   return (
-    <AuthContext.Provider value={(signUp, logIn, logOut, user)}>
+    <AuthContext.Provider value={{ user, signUp, logIn, logOut }}>
       {children}
     </AuthContext.Provider>
   );
 }
+
 export function UserAuth() {
   return useContext(AuthContext);
 }
